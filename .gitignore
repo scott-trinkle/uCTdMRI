@@ -1,0 +1,6 @@
+.DS_Store
+register/*
+*pycache*
+*stack_viewer*
+*.ipynb_checkpoints*
+*.tif
