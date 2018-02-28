@@ -5,8 +5,8 @@ from skimage.feature import structure_tensor, structure_tensor_eigvals
 import tifffile
 from st3d import structure_tensor_3D
 
-commissure = io.imread('anterior_commissure_8x_sub_sample.tif')
-fibers = io.imread('artificial-fibers.tif')
+commissure = io.imread('data/anterior_commissure_8x_sub_sample.tif')
+fibers = io.imread('data/artificial-fibers.tif')
 
 
 def st_analysis_2D(im, sigma=2):
@@ -60,3 +60,29 @@ def save(fn, im):
 
 # 23, 70, 250
 FA, vects = st_analysis_3D(commissure, 2)
+
+from mpl_toolkits.mplot3d import axes3d
+
+# p0 = [0.799319, -3.477045e-01, 0.490093]
+# p1 = [0.852512, 9.113778e-16, -0.522708]
+# p2 = [0.296422, 9.376042e-01, 0.181748]
+
+# origin = [0, 0, 0]
+# X, Y, Z = zip(origin, origin, origin)
+# U, V, W = zip(p0, p1, p2)
+
+z, y, x = commissure.shape
+
+Z, Y, X = np.meshgrid(np.arange(z),
+                      np.arange(y),
+                      np.arange(y))
+
+U = vects[..., 0]
+V = vects[..., 1]
+W = vects[..., 2]
+
+
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.quiver(X, Y, Z, U, V, W, arrow_length_ratio=0.01)
+# plt.show()
