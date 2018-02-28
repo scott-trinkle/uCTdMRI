@@ -1,0 +1,1 @@
+'linear_transform_0GenericAffine.mat' is a rigid + affine transformation from the 8x xray data to the upsampled 50_um MRI data. 
