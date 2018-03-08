@@ -107,7 +107,7 @@ def _compute_derivatives(image, mode='constant', cval=0):
 
     imz = ndi.sobel(image, axis=0, mode=mode, cval=cval)
     imy = ndi.sobel(image, axis=1, mode=mode, cval=cval)
-    imx = ndi.sobel(image, axis=1, mode=mode, cval=cval)
+    imx = ndi.sobel(image, axis=2, mode=mode, cval=cval)
 
     return imx, imy, imz
 
