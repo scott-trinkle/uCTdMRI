@@ -1,6 +1,9 @@
 '''
 This script extends the structure_tensor function from skimage to 3D. 
 Most of the code is directly modified. 
+
+NOTE: These functions assume the image volumes are NumPy arrays with 
+shape = (x, y, z)
 '''
 
 import numpy as np
@@ -104,10 +107,9 @@ def _compute_derivatives(image, mode='constant', cval=0):
         Derivative in x-direction.
 
     """
-
-    imz = ndi.sobel(image, axis=0, mode=mode, cval=cval)
+    imx = ndi.sobel(image, axis=0, mode=mode, cval=cval)
     imy = ndi.sobel(image, axis=1, mode=mode, cval=cval)
-    imx = ndi.sobel(image, axis=2, mode=mode, cval=cval)
+    imz = ndi.sobel(image, axis=2, mode=mode, cval=cval)
 
     return imx, imy, imz
 

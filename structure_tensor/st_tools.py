@@ -12,7 +12,10 @@ def _rescale(a):
 def st_2D(im, sigma=2):
     '''
     Calculates the principal orientation direction and anisotropy index
-    from a 2D image using the structure tensor. 
+    from a 2D image using the structure tensor.
+
+    Assumes image shape is (y,x)
+
 
     Returns:
     ________
@@ -33,10 +36,10 @@ def st_2D(im, sigma=2):
 
 def make_2D_rgb(im, sigma):
     '''
-    Make HSL (Hue, Saturation, Level) image from 2D structure tensor results. 
-    Hue: Theta, Saturation: AI, Level: im. 
+    Make HSL (Hue, Saturation, Level) image from 2D structure tensor results.
+    Hue: Theta, Saturation: AI, Level: im.
 
-    Converts HSL to RGB for export to tiff. 
+    Converts HSL to RGB for export to tiff.
     '''
 
     theta, AI = st_2D(im, sigma)
@@ -51,7 +54,9 @@ def make_2D_rgb(im, sigma):
 def st_3D(im, sigma):
     '''
     Calculates principal orientation vector and fractional anisotropy from
-    a 3D volume using the structure tensor. 
+    a 3D volume using the structure tensor.
+
+    NOTE: Assumes image shape is (x,y,z)
     '''
 
     fxx, fxy, fxz, fyy, fyz, fzz = structure_tensor_3D(im, sigma)
@@ -65,24 +70,36 @@ def st_3D(im, sigma):
     evals, evectors = np.linalg.eigh(F)
     evectors = evectors[..., 0]  # taking vector w/ smallest eval
 
-    # t1 = 2  largest
-    # t2 = 1  middle
-    # t3 = 0  smallest
+    FA = np.where(np.linalg.norm(evals, axis=-1) **
+                  2 != 0, _FA(evals), np.zeros_like(im))
 
-    FA = np.where(np.linalg.norm(evals, axis=-1) ** 2 != 0,
-                  np.sqrt(0.5 * ((evals[..., 2] - evals[..., 1])**2 +
-                                 (evals[..., 1] - evals[..., 0])**2 +
-                                 (evals[..., 2] - evals[..., 0])**2) / (np.linalg.norm(evals, axis=-1)**2)), np.zeros_like(im))
     return FA, evectors
+
+
+def _FA(evals):
+    '''
+    Calculates fractional anisotropy image from the eigenvalues image. 
+    Eigenvalues are ordered from smallest to largest, so t1 > t2 > t3. 
+
+    Formula taken from [Khan et al, NeuroImage (111), 2015.]
+    '''
+
+    t1 = evals[..., 2]
+    t2 = evals[..., 1]
+    t3 = evals[..., 0]
+
+    norm2 = t1**2 + t2**2 + t3**2
+    with np.errstate(invalid='ignore'):
+        return np.sqrt(((t1 - t2)**2 + (t2 - t3)**2 + (t3 - t1)**2) / (2 * norm2))
 
 
 def make_3D_rgb(im, sigma, bit=50):
     '''
-    Makes HSL (Hue, Saturation, Level) image from 3D structure tensor results. 
+    Makes HSL (Hue, Saturation, Level) image from 3D structure tensor results.
     Hue is mapped from orientation (more work on that in the future), Saturation:
-    FA, Level: im. 
+    FA, Level: im.
 
-    Converts HSL to RGB stack for export to tiff. 
+    Converts HSL to RGB stack for export to tiff.
     '''
 
     FA, vects = st_3D(im, sigma)
@@ -100,7 +117,7 @@ def make_3D_rgb(im, sigma, bit=50):
 
 def save_rgb(fn, im):
     '''
-    Saves output of make_2D_rgb or make_3D_rgb as tiff image. 
+    Saves output of make_2D_rgb or make_3D_rgb as tiff image.
 
     Example:
     save_rgb('results/visualize_3d/full_sample_sigma_3.tif', make_3D_rgb(im, 3))
@@ -119,7 +136,8 @@ def make_comps(vects, im):
     '''
     Returns separate arrays for three components of eigenvector, masked by im
     '''
-    u = np.where(im != 0, vects[..., 2], np.zeros_like(im))  # x
+    u = np.where(im != 0, vects[..., 0], np.zeros_like(im))  # x
     v = np.where(im != 0, vects[..., 1], np.zeros_like(im))  # y
-    w = np.where(im != 0, vects[..., 0], np.zeros_like(im))  # z (^I assume...)
+    w = np.where(im != 0, vects[..., 2], np.zeros_like(im))  # z
+
     return u, v, w
