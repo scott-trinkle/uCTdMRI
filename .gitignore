@@ -8,3 +8,4 @@
 *.nii.gz
 deformable_150
 *.pyc
+misc_tests
