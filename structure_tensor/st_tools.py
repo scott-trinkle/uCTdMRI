@@ -56,7 +56,7 @@ def make_2D_rgb(im, sigma):
     return color.hsv2rgb(hsv)
 
 
-def st_3D(im, d_sigma, n_sigma):
+def st_3D(im, d_sigma, n_sigma, westin=False):
     '''
     Calculates principal orientation vector and fractional anisotropy from
     a 3D volume using the structure tensor.
@@ -64,7 +64,6 @@ def st_3D(im, d_sigma, n_sigma):
     NOTE: Assumes image shape is (x,y,z)
     '''
 
-    print('Calculating tensor elements')
     fxx, fxy, fxz, fyy, fyz, fzz = _structure_tensor_3D(
         im, d_sigma=d_sigma, n_sigma=n_sigma)
 
@@ -75,12 +74,14 @@ def st_3D(im, d_sigma, n_sigma):
     # np.linalg.eigh requires shape = (...,3,3)
     F = np.moveaxis(F, [0, 1], [3, 4])
 
-    print('Calculating eigenvectors')
     evals, evectors = np.linalg.eigh(F)
     evectors = evectors[..., 0]  # taking vector w/ smallest eval
 
-    FA = np.where(np.linalg.norm(evals, axis=-1) **
-                  2 != 0, _FA(evals), np.zeros_like(im))
+    if westin:
+        FA = np.where(evals[..., 2] != 0, _westin(evals), np.zeros_like(im))
+    else:
+        FA = np.where(np.linalg.norm(evals, axis=-1) **
+                      2 != 0, _FA(evals), np.zeros_like(im))
 
     return FA, evectors
 
@@ -100,6 +101,15 @@ def _FA(evals):
     norm2 = t1**2 + t2**2 + t3**2
     with np.errstate(invalid='ignore'):
         return np.sqrt(((t1 - t2)**2 + (t2 - t3)**2 + (t3 - t1)**2) / (2 * norm2))
+
+
+def _westin(evals):
+
+    t1 = evals[..., 2]  # largest
+    t2 = evals[..., 1]  # middle
+    t3 = evals[..., 0]  # smallest
+
+    return (t2 - t3) / t1
 
 
 def make_3D_rgb(im, d_sigma=1.0, n_sigma=1.0, bit=50):
