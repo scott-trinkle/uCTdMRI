@@ -30,8 +30,8 @@ d = np.ones(nspots) * d_angle / 2 * pi / 180
 
 # Returns center bin values
 n_grid = res if phantom == 'fixed' else nbins
-tbin = np.linspace(0, pi, n_grid)
-pbin = np.linspace(0, 2 * pi, n_grid)
+tbin = np.linspace(0, pi, 180)
+pbin = np.linspace(0, 2 * pi, 360)
 
 # Create a sphere
 T, P = np.meshgrid(tbin, pbin, indexing='ij')
@@ -43,32 +43,20 @@ z = r * np.cos(T)
 if phantom == 'xray':
     print('Reading image')
     im = io.imread('../../data/recon_2x_stack-1.tif')
+    im = np.moveaxis(im, [0, 2], [2, 0])
 
     print('Running ST analysis')
     FA, vects = st.st_3D(im,
                          d_sigma=2,
-                         n_sigma=5,
+                         n_sigma=7,
                          westin=True)
     print('saving')
-    fig, axs = plt.subplots(1, 2)
 
-    sl = 25
-    axs[0].imshow(FA[sl], cmap='gray')
-    axs[0].set_title('FA')
-    axs[0].axis('off')
-    axs[1].imshow(im[sl], cmap='gray')
-    axs[1].set_title('Im')
-    axs[1].axis('off')
-    plt.show()
+    r = np.sqrt(vects[..., 0]**2 + vects[..., 1]**2 + vects[..., 2]**2)
+    theta = np.arccos(vects[..., 2] / r)
+    phi = np.arctan2(vects[..., 1], vects[..., 0]) + np.pi
 
-    # r = np.sqrt(vects[..., 0]**2 + vects[..., 1]**2 + vects[..., 2]**2)
-    # theta = np.arccos(vects[..., 2] / r)
-    # phi = np.arctan2(vects[..., 1], vects[..., 0]) + np.pi
-
-    # norm = False if log else True
-
-    # H, _, _ = np.histogram2d(theta.flatten(), phi.flatten(), bins=nbins,
-    #                          normed=norm)
+    H, _, _ = np.histogram2d(theta.flatten(), phi.flatten(), bins=[180, 360])
 
 
 if phantom == 'pairwise':
@@ -97,37 +85,37 @@ if phantom == 'fixed':
 
 
 if log:
-    H = np.log(H, where=H > 0)
+    H = np.log10(H, where=(H > 0))
 if scaled:
     x *= H
     y *= H
     z *= H
 
-# if mayavi:
-#     mlab.figure()
-#     mlab.mesh(x, y, z, scalars=H, colormap='jet')
+if mayavi:
+    mlab.figure()
+    mlab.mesh(x, y, z, scalars=H)
 
-#     if phantom == 'xray':
-#         mlab.figure()
-#         u, w, v = st.make_comps(vects, im)
-#         field = mlab.quiver3d(u, w, v,
-#                               scalars=FA,
-#                               line_width=2.0,
-#                               scale_factor=0.5,
-#                               colormap='jet')
-#         field.glyph.color_mode = 'color_by_scalar'
-#         field.glyph.glyph_source.glyph_source.center = [0, 0, 0]
-#         mlab.colorbar()
-
-#     mlab.show()
-# else:
-#     plt.imshow(H)
-#     plt.colorbar()
-#     plt.xlabel('phi')
-#     plt.ylabel('theta')
-#     ticks = np.linspace(0, nbins - 1, 5)
-#     tlabels = np.linspace(0, 180, 5, dtype=int)
-#     plabels = np.linspace(0, 360, 5, dtype=int)
-#     plt.xticks(ticks, plabels)
-#     plt.yticks(ticks, tlabels)
-#     plt.show()
+    # if phantom == 'xray':
+    #     mlab.figure()
+    #     u, w, v = st.make_comps(vects, im)
+    #     field = mlab.quiver3d(u, w, v,
+    #                           scalars=FA,
+    #                           line_width=2.0,
+    #                           scale_factor=0.5,
+    #                           colormap='jet')
+    #     field.glyph.color_mode = 'color_by_scalar'
+    #     field.glyph.glyph_source.glyph_source.center = [0, 0, 0]
+    #     mlab.colorbar()
+    mlab.colorbar()
+    mlab.show()
+else:
+    plt.imshow(H)
+    plt.colorbar()
+    plt.xlabel('phi')
+    plt.ylabel('theta')
+    ticks = np.linspace(0, nbins - 1, 5)
+    tlabels = np.linspace(0, 180, 5, dtype=int)
+    plabels = np.linspace(0, 360, 5, dtype=int)
+    plt.xticks(ticks, plabels)
+    plt.yticks(ticks, tlabels)
+    plt.show()

@@ -108,8 +108,8 @@ def _westin(evals):
     t1 = evals[..., 2]  # largest
     t2 = evals[..., 1]  # middle
     t3 = evals[..., 0]  # smallest
-
-    return (t2 - t3) / t1
+    with np.errstate(invalid='ignore'):
+        return (t2 - t3) / t1
 
 
 def make_3D_rgb(im, d_sigma=1.0, n_sigma=1.0, bit=50):
