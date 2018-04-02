@@ -1,8 +1,6 @@
 import numpy as np
 from skimage import io
-import sys
-sys.path.append('..')
-import st_tools as st
+from strtens import StructureTensor
 import tifffile as tf
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -25,17 +23,16 @@ for dsig in dsigs:
         print('dsig: {}\nnsig: {}'.format(dsig, nsig))
 
         print('Running STA')
-        FA, vects = st.st_3D(im,
-                             d_sigma=dsig,
-                             n_sigma=nsig,
-                             westin=True)
+        FA, vects = StructureTensor(im,
+                                    d_sigma=dsig,
+                                    n_sigma=nsig).st_results()
 
         r = np.sqrt(vects[..., 0]**2 + vects[..., 1]**2 + vects[..., 2]**2)
         theta = np.arccos(vects[..., 2] / r)
         phi = np.arctan2(vects[..., 1], vects[..., 0]) + np.pi
 
         H, _, _ = np.histogram2d(theta.flatten(), phi.flatten(), bins=nbins)
-        
+
         fig, ax = plt.subplots()
 
         hist = ax.imshow(H, norm=LogNorm(vmin=1, vmax=H.max()))
@@ -53,7 +50,6 @@ for dsig in dsigs:
         plt.xticks(phi_ticks, phi_labels)
         plt.yticks(theta_ticks, theta_labels)
         fig.colorbar(hist, cax=cax)
-
 
         print('Saving...\n')
         plt.savefig('hists/d{}_n{}.tif'.format(dsig, nsig), dpi=300)

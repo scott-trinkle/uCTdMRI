@@ -1,12 +1,13 @@
 .DS_Store
-*pycache*
+__pycache__
 *.ipynb_checkpoints*
 *.tif
 *data
 *results
-*old_tests
 *.nii.gz
-deformable_150
+registrations
 *.pyc
 *.vtu
 *.org
+*.egg-info
+scratch

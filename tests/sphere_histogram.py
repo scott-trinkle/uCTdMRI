@@ -2,9 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
 from mayavi import mlab
-import sys
-sys.path.append('..')
-import st_tools as st
+from strtens import StructureTensor
 import tifffile as tf
 
 phantom = 'xray'
@@ -46,10 +44,10 @@ if phantom == 'xray':
     im = np.moveaxis(im, [0, 2], [2, 0])
 
     print('Running ST analysis')
-    FA, vects = st.st_3D(im,
-                         d_sigma=2,
-                         n_sigma=7,
-                         westin=True)
+    FA, vects = StructureTensor(im,
+                                d_sigma=2,
+                                n_sigma=7).st_results(metric='westin')
+
     print('saving')
 
     r = np.sqrt(vects[..., 0]**2 + vects[..., 1]**2 + vects[..., 2]**2)
