@@ -6,3 +6,7 @@
 *results
 *old_tests
 *.nii.gz
+deformable_150
+*.pyc
+*.vtu
+*.org

@@ -7,10 +7,10 @@ from skimage._shared.utils import assert_nD
 from skimage.util.dtype import img_as_float
 
 
-from st3d import structure_tensor_3D
-
-
 def _rescale(a):
+    '''
+    Rescales an array to 0-1.0
+    '''
     return (a - a.min()) / (a - a.min()).max()
 
 
@@ -56,7 +56,7 @@ def make_2D_rgb(im, sigma):
     return color.hsv2rgb(hsv)
 
 
-def st_3D(im, sigma):
+def st_3D(im, d_sigma, n_sigma, westin=False):
     '''
     Calculates principal orientation vector and fractional anisotropy from
     a 3D volume using the structure tensor.
@@ -64,7 +64,9 @@ def st_3D(im, sigma):
     NOTE: Assumes image shape is (x,y,z)
     '''
 
-    fxx, fxy, fxz, fyy, fyz, fzz = _structure_tensor_3D(im, sigma)
+    fxx, fxy, fxz, fyy, fyz, fzz = _structure_tensor_3D(
+        im, d_sigma=d_sigma, n_sigma=n_sigma)
+
     F = np.array([[fxx, fxy, fxz],
                   [fxy, fyy, fyz],
                   [fxz, fyz, fzz]])
@@ -75,8 +77,11 @@ def st_3D(im, sigma):
     evals, evectors = np.linalg.eigh(F)
     evectors = evectors[..., 0]  # taking vector w/ smallest eval
 
-    FA = np.where(np.linalg.norm(evals, axis=-1) **
-                  2 != 0, _FA(evals), np.zeros_like(im))
+    if westin:
+        FA = np.where(evals[..., 2] != 0, _westin(evals), np.zeros_like(im))
+    else:
+        FA = np.where(np.linalg.norm(evals, axis=-1) **
+                      2 != 0, _FA(evals), np.zeros_like(im))
 
     return FA, evectors
 
@@ -98,7 +103,16 @@ def _FA(evals):
         return np.sqrt(((t1 - t2)**2 + (t2 - t3)**2 + (t3 - t1)**2) / (2 * norm2))
 
 
-def make_3D_rgb(im, sigma, bit=50):
+def _westin(evals):
+
+    t1 = evals[..., 2]  # largest
+    t2 = evals[..., 1]  # middle
+    t3 = evals[..., 0]  # smallest
+    with np.errstate(invalid='ignore'):
+        return (t2 - t3) / t1
+
+
+def make_3D_rgb(im, d_sigma=1.0, n_sigma=1.0, bit=50):
     '''
     Makes HSL (Hue, Saturation, Level) image from 3D structure tensor results.
     Hue is mapped from orientation (more work on that in the future), Saturation:
@@ -107,7 +121,7 @@ def make_3D_rgb(im, sigma, bit=50):
     Converts HSL to RGB stack for export to tiff.
     '''
 
-    FA, vects = st_3D(im, sigma)
+    FA, vects = st_3D(im, d_sigma=d_sigma, n_sigma=n_sigma)
 
     s = bit**2 + vects[..., 0] + bit * vects[..., 1] + vects[..., 2]
 
@@ -137,7 +151,7 @@ def save_rgb(fn, im):
     tifffile.imsave(fn, rescaled)
 
 
-def make_comps(vects, im):
+def make_comps(vects, im, reorient=False):
     '''
     Returns separate arrays for three components of eigenvector, masked by im
     '''
@@ -145,10 +159,16 @@ def make_comps(vects, im):
     v = np.where(im != 0, vects[..., 1], np.zeros_like(im))  # y
     w = np.where(im != 0, vects[..., 2], np.zeros_like(im))  # z
 
+    if reorient:
+        cond = (w < 0) | ((w == 0) & (v < 0)) | ((w == 0) & (v == 0) & (u < 0))
+        u = np.where(cond, -1 * u, u)
+        v = np.where(cond, -1 * v, v)
+        w = np.where(cond, -1 * w, w)
+
     return u, v, w
 
 
-def _structure_tensor_3D(image, sigma=1, mode='constant', cval=0):
+def _structure_tensor_3D(image, d_sigma=1, n_sigma=1, mode='constant', cval=0):
     """
     MODIFIED FROM SKIMAGE BY SCOTT TRINKLE, 2018
 
@@ -167,7 +187,9 @@ def _structure_tensor_3D(image, sigma=1, mode='constant', cval=0):
     ----------
     image : ndarray
         Input image.
-    sigma : float, optional
+    d_sigma : float, optional
+        Standard deviation used for the Gaussian partial derivatives
+    n_sigma : float, optional
         Standard deviation used for the Gaussian kernel, which is used as a
         weighting function for the local summation of squared differences.
     mode : {'constant', 'reflect', 'wrap', 'nearest', 'mirror'}, optional
@@ -208,22 +230,23 @@ def _structure_tensor_3D(image, sigma=1, mode='constant', cval=0):
 
     """
 
-    image = _prepare_grayscale_input_3D(image)
+    # image = _prepare_grayscale_input_3D(image)
 
-    imx, imy, imz = _compute_derivatives(image, mode=mode, cval=cval)
+    imx, imy, imz = _compute_derivatives(
+        image, d_sigma=d_sigma, mode=mode, cval=cval)
 
     # structure tensor
-    Axx = ndi.gaussian_filter(imx * imx, sigma, mode=mode, cval=cval)
-    Axy = ndi.gaussian_filter(imx * imy, sigma, mode=mode, cval=cval)
-    Axz = ndi.gaussian_filter(imx * imz, sigma, mode=mode, cval=cval)
-    Ayy = ndi.gaussian_filter(imy * imy, sigma, mode=mode, cval=cval)
-    Ayz = ndi.gaussian_filter(imy * imz, sigma, mode=mode, cval=cval)
-    Azz = ndi.gaussian_filter(imz * imz, sigma, mode=mode, cval=cval)
+    Axx = ndi.gaussian_filter(imx * imx, n_sigma, mode=mode, cval=cval)
+    Axy = ndi.gaussian_filter(imx * imy, n_sigma, mode=mode, cval=cval)
+    Axz = ndi.gaussian_filter(imx * imz, n_sigma, mode=mode, cval=cval)
+    Ayy = ndi.gaussian_filter(imy * imy, n_sigma, mode=mode, cval=cval)
+    Ayz = ndi.gaussian_filter(imy * imz, n_sigma, mode=mode, cval=cval)
+    Azz = ndi.gaussian_filter(imz * imz, n_sigma, mode=mode, cval=cval)
 
     return Axx, Axy, Axz, Ayy, Ayz, Azz
 
 
-def _compute_derivatives(image, mode='constant', cval=0):
+def _compute_derivatives(image, d_sigma=1.0, mode='constant', cval=0):
     """
     MODIFIED FROM SKIMAGE BY SCOTT TRINKLE, 2018
 
@@ -233,6 +256,8 @@ def _compute_derivatives(image, mode='constant', cval=0):
     ----------
     image : ndarray
         Input image.
+    d_sigma : float
+        Standard deviation for Gaussian partial derivative
     mode : {'constant', 'reflect', 'wrap', 'nearest', 'mirror'}, optional
         How to handle values outside the image borders.
     cval : float, optional
@@ -249,9 +274,15 @@ def _compute_derivatives(image, mode='constant', cval=0):
         Derivative in x-direction.
 
     """
-    imx = ndi.sobel(image, axis=0, mode=mode, cval=cval)
-    imy = ndi.sobel(image, axis=1, mode=mode, cval=cval)
-    imz = ndi.sobel(image, axis=2, mode=mode, cval=cval)
+    # imx = ndi.sobel(image, axis=0, mode=mode, cval=cval)
+    # imy = ndi.sobel(image, axis=1, mode=mode, cval=cval)
+    # imz = ndi.sobel(image, axis=2, mode=mode, cval=cval)
+    imx = ndi.gaussian_filter(
+        image, [d_sigma, 0, 0], order=1, mode=mode, cval=cval)
+    imy = ndi.gaussian_filter(
+        image, [0, d_sigma, 0], order=1, mode=mode, cval=cval)
+    imz = ndi.gaussian_filter(
+        image, [0, 0, d_sigma], order=1, mode=mode, cval=cval)
 
     return imx, imy, imz
 
