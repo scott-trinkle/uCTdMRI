@@ -10,3 +10,6 @@ registrations
 *.org
 *.egg-info
 scratch
+*.mov
+*.pptx
+*.avi
