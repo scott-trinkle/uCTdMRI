@@ -51,6 +51,6 @@ for dsig in dsigs:
         fig.colorbar(hist, cax=cax)
 
         print('Saving...\n')
-        plt.savefig('hists/d{}_n{}.tif'.format(dsig, nsig), dpi=300)
+        plt.savefig('hists/d{}_n{}.png'.format(dsig, nsig), dpi=300)
 
 print('Done!')
