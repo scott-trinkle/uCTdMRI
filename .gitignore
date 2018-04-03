@@ -2,8 +2,7 @@
 __pycache__
 *.ipynb_checkpoints*
 *.tif
-*data
-*results
+data
 *.nii.gz
 registrations
 *.pyc
