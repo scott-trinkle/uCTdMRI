@@ -264,21 +264,21 @@ location. Initial results are shown in Figure~\ref{fig:ODFs}.
     \caption{AI-thresholded ODF, view 2\label{fig:maskedv2}}
   \end{subfigure}
   \caption{(a-b) Two views of the raw ODF, sampled with n=800 points on the
-    sphere. Note that the orientations fall narrowly into a single plane. (c-d)
-    Two views of the same ODF, thresholded to only include voxels with
-    AI~$> \frac{1}{2}$max(AI). \textbf{NOTE}: The colormap in these figures
-    represents bin count, and should not be confused with the orientation
-    colormap discussed previously.\label{fig:ODFs}}
+    sphere. (c-d) Two views of the same ODF, thresholded to only include voxels
+    with AI~$>$ mean(AI). Note that the orientations fall narrowly into a single
+    plane.\label{fig:ODFs}}
 \end{figure}
-Figures~\ref{fig:rawv1} and \ref{fig:rawv2} depict the raw ODF for the entire
-sample volume, while Figures~\ref{fig:maskedv1} and \ref{fig:maskedv2} depict
-the ODF after thresholding by AI~$>\frac{1}{2}$max(AI). As expected, the AI
-thresholding generates a more narrow, directed ODF. Also, as with the results in
+Figures~\ref{fig:rawv1} and~\ref{fig:rawv2} depict the raw ODF for the entire
+sample volume, while Figures~\ref{fig:maskedv1} and~\ref{fig:maskedv2} depict
+the ODF after thresholding by AI~$>$ mean(AI). As expected, the AI thresholding
+generates a more narrow, directed ODF. Also, as with the results in
 Figure~\ref{fig:sample}, most orientations appear to fall more in line with the
 positive $x$-axis than the $z$-axis, indicating an incorrect coordinate frame
-definition at some point in the pipeline. Again, a rigorous sensitivity study
-will allow us to validate the absolute orientations, as well as to optimize the
-choice of AI metric and threshold value.
+definition at some point in the pipeline. It is also worth noting that most
+orientations seem to be falling within a single plane, identified in
+Figures~\ref{fig:rawv2} and ~\ref{fig:maskedv2}. Again, a rigorous sensitivity
+study will allow us to validate the absolute orientations, as well as to
+optimize the choice of AI metric and threshold value.
 
 The next step is to expand this orientation distribution function on the
 spherical harmonics for use in various comparison metrics with the MRI
