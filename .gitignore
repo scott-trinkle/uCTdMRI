@@ -1,15 +1,20 @@
+# Auto
 .DS_Store
 __pycache__
 *.ipynb_checkpoints*
-*.tif
-data
-*.nii.gz
-registrations
-*.pyc
-*.vtu
-*.org
 *.egg-info
-scratch
+*.pyc
+
+# Large files
+*.tif
+*.nii.gz
+*.vtu
 *.mov
-*.pptx
 *.avi
+*.pptx
+
+# Folders
+registrations
+scratch
+hists
+*.org

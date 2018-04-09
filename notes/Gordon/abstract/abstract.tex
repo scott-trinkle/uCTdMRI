@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+\usepackage{mystyle}
+
+\title{Towards whole-brain validation of diffusion MRI fiber orientation distributions with x-ray microcomputed tomography}
+\author{Scott Trinkle, Sean Foxley, Narayanan Kasthuri and Patrick La Rivi\`ere}
+\date{}
+
+\begin{document}
+\maketitle
+
+Diffusion MRI (dMRI) is a powerful, non-invasive tool for characterizing
+three-dimensional (3D) tissue microstructure on a macroscopic scale, and is
+widely used in both research and clinical settings. New methods of
+reconstructing 3D fiber orientation distributions (FODs) from dMRI data are
+rapidly being developed, each based on the assumption that dMRI provides an
+accurate model of the underlying anatomical fiber structure. Previous efforts to
+validate this assumption have relied on ground truth histological data with
+non-isotropic resolution over a small field of view. In this study, we
+develop a pipeline for the use of natively isotropic, synchrotron-based x-ray microcomputed
+tomography ($\mu$CT) data to validate dMRI FODs over a whole mouse brain.
+
+A post-mortem brain was scanned with dMRI (\textit{waiting on MRI specs from
+  Sean}) at 150 $\mu\text{m}^3$ resolution. The specimen was then stained
+(\textit{what are the stains? Anything else on uCT preparation?}) and imaged at
+the Advanced Photon Source at Argonne National Lab using a mosaic sinogram
+stitching method, yielding an image volume over the whole brain with isotropic
+1.2 $\mu\text{m}^3$ resolution. N (\textit{actual number TBD}) sample ROI were
+identified for validation based on prior anatomical knowledge. Structure tensor
+analysis was performed on the x-ray data to compute a ground truth FOD for each
+ROI. The corresponding FODs from the dMRI data were evaluated based on overall
+agreement in FOD shape, correct assessment of the number of fiber populations,
+and angular accuracy in orientation (\textit{criteria taken verbatim from
+  Schilling}).
+
+(\textit{Expecting comparable results to Schilling, actual results TBD}) 
+
+This study has led to the development of a pipeline for performing quantitative
+3D validation of dMRI FODs over a whole mouse brain with isotropic resolution.
+Ground truth FODs across the whole brain will allow for further validation studies
+in dMRI and tractography. 
+
+
+% Schilling
+% MRI
+% - 300 um^3 isotropic resolution
+% 3D histology
+% - 0.18x0.18x0.42 um^3 resolution
+% - In plane FOV of 900 x 900 um (9 MRI voxels)
+% - N > 10 regions for each histogram bin from <30-90 degrees with bin width 10
+%   - So ~100 total regions, each the size of 9 MRI voxels
+
+\end{document}
