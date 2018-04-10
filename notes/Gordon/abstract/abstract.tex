@@ -1,8 +1,17 @@
 \documentclass[11pt]{article}
-\usepackage{mystyle}
+\usepackage[
+top    = 1.5cm,
+bottom = 1.5cm,
+left   = 1.5cm,
+right  = 1.5cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{amsmath}
 
-\title{Towards whole-brain validation of diffusion MRI fiber orientation distributions with x-ray microcomputed tomography}
-\author{Scott Trinkle, Sean Foxley, Narayanan Kasthuri and Patrick La Rivi\`ere}
+\title{Towards whole-brain validation of diffusion MRI fiber orientation
+  distributions with x-ray microcomputed tomography}
+\author{Scott Trinkle, Sean
+  Foxley, Narayanan Kasthuri and Patrick La Rivi\`ere}
 \date{}
 
 \begin{document}
@@ -14,39 +23,35 @@ widely used in both research and clinical settings. New methods of
 reconstructing 3D fiber orientation distributions (FODs) from dMRI data are
 rapidly being developed, each based on the assumption that dMRI provides an
 accurate model of the underlying anatomical fiber structure. Previous efforts to
-validate this assumption have relied on ground truth histological data with
-non-isotropic resolution over a small field of view. In this study, we
-develop a pipeline for the use of natively isotropic, synchrotron-based x-ray microcomputed
-tomography ($\mu$CT) data to validate dMRI FODs over a whole mouse brain.
+validate these FODs have relied on ground truth histological data with
+non-isotropic resolution over small regions of interest (ROI). In this study, we
+demonstrate a pipeline for the use of natively isotropic, synchrotron-based x-ray
+microcomputed tomography data to validate FODs over a whole mouse brain.
 
 A post-mortem brain was scanned with dMRI (\textit{waiting on MRI specs from
-  Sean}) at 150 $\mu\text{m}^3$ resolution. The specimen was then stained
-(\textit{what are the stains? Anything else on uCT preparation?}) and imaged at
-the Advanced Photon Source at Argonne National Lab using a mosaic sinogram
-stitching method, yielding an image volume over the whole brain with isotropic
-1.2 $\mu\text{m}^3$ resolution. N (\textit{actual number TBD}) sample ROI were
-identified for validation based on prior anatomical knowledge. Structure tensor
-analysis was performed on the x-ray data to compute a ground truth FOD for each
-ROI. The corresponding FODs from the dMRI data were evaluated based on overall
-agreement in FOD shape, correct assessment of the number of fiber populations,
-and angular accuracy in orientation (\textit{criteria taken verbatim from
-  Schilling}).
+  Sean}) at 150 $\mu\text{m}$ isotropic resolution. The specimen was then
+stained (\textit{what are the stains? Other info on uCT sample preparation?})
+and imaged at the Advanced Photon Source at Argonne National Lab using a mosaic
+stitching method, yielding an image voluem over the whole brain with 1.2 $\mu$m
+isotropic resolution. N (\textit{actual number TBD}) sample ROI were identified
+for validation based on anatomical locations with crossing fiber populations
+that are known to challenge dMRI algorithms. Structure tensor analysis was
+performed on the x-ray data to compute a ground truth FOD at each ROI. The
+corresponding FODs from the dMRI data were evaluated based on overall agreement
+in FOD shape, correct assessment of the number of fiber populations, and angular
+accuracy in orientation (\textit{criteria taken verbatim from Schilling}).
 
-(\textit{Expecting comparable results to Schilling, actual results TBD}) 
+(\textit{Results TBD. I think the goal should be to demonstrate comparable
+  results to previous validation studies over a few ROI, to justify the use of
+  this dataset/method for a future whole-brain study.})
 
-This study has led to the development of a pipeline for performing quantitative
-3D validation of dMRI FODs over a whole mouse brain with isotropic resolution.
-Ground truth FODs across the whole brain will allow for further validation studies
-in dMRI and tractography. 
-
-
-% Schilling
-% MRI
-% - 300 um^3 isotropic resolution
-% 3D histology
-% - 0.18x0.18x0.42 um^3 resolution
-% - In plane FOV of 900 x 900 um (9 MRI voxels)
-% - N > 10 regions for each histogram bin from <30-90 degrees with bin width 10
-%   - So ~100 total regions, each the size of 9 MRI voxels
+This study has demonstrated the feasibility of performing quantitative 3D
+validation of dMRI FODs with synchrotron x-ray data. Applying this analysis to a
+whole mouse brain will provide a wealth of information regarding the ability of
+different dMRI algorithms to represent microstructural regions of varying
+complexity (\textit{It might be cool to one day have a spatial map over the whole
+  brain of where the MRI is failing}). Ground truth FODs across the whole brain
+will allow for future large-scale validation studies in both dMRI and
+tractography.
 
 \end{document}
