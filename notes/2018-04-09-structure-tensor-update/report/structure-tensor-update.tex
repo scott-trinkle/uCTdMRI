@@ -9,6 +9,15 @@
 
 \maketitle
 
+\textbf{NOTE:} The results in this document are inaccurate. The xray data is
+given as unsigned 8-bit integers. When an 8-bit unsigned integer is assigned a
+value greater than 255, NumPy wraps the overflow around 0; i.e., if ``a'' is an
+unsigned 8-bit int, and you assign a = 260, a will \textit{actually} be assigned
+the value 4. When calculating the structure tensor, the partial derivatives are
+squared, causing this overflow in many, but not all voxels. Updated figures
+are available in the folder 'notes/2018-04-24-redo-report-figs-with-dtype-fix'.\newline
+
+
 The concept of structure tensor analysis seems to have been initially developed
 in a 1987 computer vision paper by Bigun and Granlund~\cite{Bigun1987}. It has
 since been used for a variety of computer vision and materials science
