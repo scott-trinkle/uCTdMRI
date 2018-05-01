@@ -2,7 +2,6 @@ import numpy as np
 from strtens.util import imread, imsave
 from sklearn import cluster
 from scipy.ndimage import gaussian_filter, binary_dilation
-import matplotlib.pyplot as plt
 
 
 def get_mask(im, sig=2.7):
@@ -20,8 +19,8 @@ def get_mask(im, sig=2.7):
 
 
 print('Reading images')
-im1 = imread('../../data/xray/recon_2x_stack-1.tif')
-im2 = imread('../../data/xray/recon_2x_stack-2.tif')
+im1 = imread('recon_2x_stack-1.tif')
+im2 = imread('recon_2x_stack-2.tif')
 
 print('Calculating')
 mask1 = get_mask(im1)
