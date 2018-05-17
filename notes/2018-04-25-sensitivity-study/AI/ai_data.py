@@ -15,40 +15,45 @@ class AI_data(object):
         self.boxplot(save=True, path=path)
         for col in self.data.columns:
             self.plot_im(col, save=True, path=path)
-        self.plot_im('AUC', 'Mask Mean', save=True, path=path)
+        self.plot_im('AUC', multiply='Mask Mean', divide='Inv Mask Mean',
+                     save=True, path=path)
 
-    def plot_im(self, col1, col2=None, save=False, path=None):
+    def plot_im(self, col, multiply=None, divide=None, save=False, path=None):
 
         fig, ax = plt.subplots()
 
         sigma_d = self.data.index.levels[0]
         sigma_n = self.data.index.levels[1]
 
-        values = self.data[col1].values.reshape(
-            (sigma_d.size, sigma_n.size)).T
+        values = self.data[col].values
+        title = '{}: {}'.format(self.metric_name, col)
 
-        if col2 is not None:
-            values *= self.data[col2].values.reshape(
-                (sigma_d.size, sigma_n.size)).T
-            ax.set_title('{}: {} * {}'.format(self.metric_name, col1, col2))
-        else:
-            ax.set_title('{}: {}'.format(self.metric_name, col1))
+        if multiply is not None:
+            multiply = [multiply] if type(multiply) == str else multiply
+            for mult in multiply:
+                values *= self.data[mult].values
+                title += ' * {}'.format(mult)
+        if divide is not None:
+            divide = [divide] if type(divide) == str else divide
+            for div in divide:
+                values /= self.data[div].values
+                title += ' / {}'.format(div)
 
+        ax.set_title(title)
+        values = values.reshape((sigma_d.size, sigma_n.size)).T
         image = ax.imshow(values, cmap=cc.m_fire)
 
         nticks = 10
 
-        xlabels = np.round(
-            1.2 * np.linspace(sigma_d.min(), sigma_d.max(), nticks), 1)
-
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=nticks))
+        xlabels = np.round(1.2 * sigma_d, 1)
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=nticks, prune='both'))
+        ax.set_xticks(ax.get_xticks() + 1)
         ax.xaxis.set_major_formatter(IndexFormatter(xlabels))
         ax.set_xlabel(r'$\sigma_D$ [$\mu$m]')
 
-        ylabels = np.round(
-            1.2 * np.linspace(sigma_n.min(), sigma_n.max(), nticks), 1)
-
-        ax.yaxis.set_major_locator(MaxNLocator(nbins=nticks))
+        ylabels = np.round(1.2 * sigma_n, 1)
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=nticks, prune='both'))
+        ax.set_yticks(ax.get_yticks() + 1)
         ax.yaxis.set_major_formatter(IndexFormatter(ylabels))
         ax.set_ylabel(r'$\sigma_N$ [$\mu$m]')
 
@@ -56,11 +61,15 @@ class AI_data(object):
         plt.tight_layout()
 
         if save:
-            fn = '{}_{}.png'.format(
-                self.metric_name, col1) if col2 is None else '{}_{}_{}.png'.format(
-                    self.metric_name, col1, col2)
+            fn = title.replace(' *', '').replace(' /',
+                                                 '').replace(':', '').replace(' ', '_') + '.png'
+            # fn = '{}_{}.png'.format(
+            #     self.metric_name, col) if col2 is None else '{}_{}_{}.png'.format(
+            #         self.metric_name, col, col2)
 
             fig.savefig(path + fn, bbox_inches='tight')
+
+        return ax
 
     def boxplot(self, save=False, path=None):
         '''
