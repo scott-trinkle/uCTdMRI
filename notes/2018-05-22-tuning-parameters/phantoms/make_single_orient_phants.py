@@ -7,6 +7,7 @@ n_fibers = 16
 r = 8
 labels = ['z', 'y', 'x']
 for i, orient in enumerate([0, 1, 2]):
+    print(i)
     phant, mask = make_orth_phantom(orient=orient,
                                     n_fibers=n_fibers,
                                     r=r)

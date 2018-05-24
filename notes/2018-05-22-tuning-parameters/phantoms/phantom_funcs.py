@@ -22,11 +22,8 @@ def get_dims(orient):
     return d1, d2
 
 
-def make_orth_phantom(orient, n_fibers, r,
-                      mu_bg=86, sigma_bg=9,
-                      mu_fib=100, sigma_fib=10,
-                      mu_vasc=49, sigma_vasc=15,
-                      vasc_mask=vasc_mask):
+def make_orth_phantom(orient, n_fibers, r, pad=1.5,
+                      mu_fib=100):
     '''
     Here, I make a phantom with straight fibers parallel to a given axis
     or set of axes.
@@ -42,8 +39,8 @@ def make_orth_phantom(orient, n_fibers, r,
         d1, d2 = get_dims(n)
 
         # choose the pixel centers in the non-orientation axis
-        c1, c2 = np.meshgrid(np.linspace(0 + 1.5 * r, d1 - 1.5 * r, int(n_fibers**0.5)),
-                             np.linspace(0 + 1.5 * r, d2 - 1.5 * r, int(n_fibers**0.5)))
+        c1, c2 = np.meshgrid(np.linspace(0 + pad * r, d1 - pad * r, int(n_fibers**0.5)),
+                             np.linspace(0 + pad * r, d2 - pad * r, int(n_fibers**0.5)))
         centers = np.vstack((c1.flatten(), c2.flatten())).T
 
         # Make fiber mask
@@ -56,7 +53,7 @@ def make_orth_phantom(orient, n_fibers, r,
 
     # Add fibers
     phant[fib_mask == 1] = np.random.poisson(
-        mu_fib, phant[fib_mask == 1].size).astype(np.uint8)
+        100, phant[fib_mask == 1].size).astype(np.uint8)
 
     return phant, fib_mask
 
@@ -80,8 +77,7 @@ def make_fib_mask(orient, r, n_fibers, centers, shape):
     return fib_mask
 
 
-def make_bg_phantom(mu_bg=86, sigma_bg=9,
-                    mu_vasc=49, sigma_vasc=15,
+def make_bg_phantom(mu_bg=86, mu_vasc=49,
                     vasc_mask=vasc_mask):
 
     shape = (125, 125, 125)
