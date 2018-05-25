@@ -14,12 +14,12 @@ def make_crossing_phantom(deg, mu_fib=100):
 
     _, base_mask = make_orth_phantom(0, 4, 8, pad=3)
 
-    fib_mask += base_mask
+    fib_mask += 2 * base_mask
 
     phant = make_bg_phantom()
 
-    phant[fib_mask == 1] = np.random.poisson(
-        100, phant[fib_mask == 1].size).astype(np.uint8)
+    phant[fib_mask > 0] = np.random.poisson(
+        100, phant[fib_mask > 0].size).astype(np.uint8)
 
     return phant, fib_mask
 
