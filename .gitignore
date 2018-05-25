@@ -4,6 +4,7 @@ __pycache__
 *.ipynb_checkpoints*
 *.egg-info
 *.pyc
+*.sh.o*
 
 # Large files
 *.tif
@@ -23,3 +24,4 @@ mri
 hardi/results
 odfs
 precomputed
+generic_xyz
