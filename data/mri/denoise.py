@@ -1,6 +1,9 @@
 '''
 This script imports the raw dMRI data and denoises it using
-local PCA. 
+local PCA [Manjon 2013].
+
+Corrects for bias due to Rician noise based on equation
+developed by Koay and Basser [Koay2006]
 '''
 import nibabel as nib
 from dipy.io import read_bvals_bvecs
