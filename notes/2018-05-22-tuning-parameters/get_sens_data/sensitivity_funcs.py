@@ -22,7 +22,7 @@ def sensitivity(imfn, maskfn, resultspath, sds, sns):
                 auc = metrics.roc_auc_score(mask.flatten(), ai.flatten())
                 f.write('{:.6f}, {:.6f}, {:.6f}, {:.6f}, '.format(
                     sd, sn, ai[mask == 1].mean(), auc))
-                theta, phi = odftools.vectors_to_spherical(vectors)
+                theta, phi = odftools.cart_to_spherical(vectors)
                 f.write('{:.16f}, {:.16f}, {:.16f}, {:.16f},'.format(
                     theta[mask == 1].mean(), theta[mask == 1].std(),
                     phi[mask == 1].mean(), phi[mask == 1].std()))
@@ -63,7 +63,7 @@ def crossing_sensitivity(imfn, maskfn, resultspath, sds, sns):
                 f.write('{:.6f}, {:.6f}, {:.6f}, {:.6f}, '.format(
                     sd, sn, ai[binmask].mean(), auc))
 
-                theta, phi = odftools.vectors_to_spherical(vectors)
+                theta, phi = odftools.cart_to_spherical(vectors)
                 f.write('{:.16f}, {:.16f}, {:.16f}, {:.16f},'.format(
                     theta[fib1mask].mean(), theta[fib1mask].std(),
                     phi[fib1mask].mean(), phi[fib1mask].std()))
@@ -83,3 +83,21 @@ def crossing_sensitivity(imfn, maskfn, resultspath, sds, sns):
     np.save(resultspath + 'peak_data', peak_data)
     np.save(resultspath + 'inds', inds)
     return np.array(peak_data)
+
+
+def get_odfs(imfn, resultspath, sds, sns):
+    im = imread(imfn)
+    sphere = odftools.make_sphere(1500)
+    odfs = []
+    odfapp = odfs.append
+    for sd in sds:
+        for sn in sns:
+            print(sd, sn)
+            vectors = StructureTensor(im,
+                                      d_sigma=sd,
+                                      n_sigma=sn).get_orientations()
+
+            theta, phi = odftools.cart_to_spherical(vectors)
+            coeffs = odftools.get_SH_coeffs(20, theta, phi)
+            odfapp(odftools.get_odf(coeffs, sphere))
+    np.save(resultspath + 'odfs', odfs)
