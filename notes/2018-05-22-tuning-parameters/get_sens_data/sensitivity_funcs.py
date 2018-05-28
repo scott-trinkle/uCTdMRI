@@ -87,9 +87,8 @@ def crossing_sensitivity(imfn, maskfn, resultspath, sds, sns):
 
 def get_odfs(imfn, resultspath, sds, sns):
     im = imread(imfn)
-    sphere = odftools.make_sphere(1500)
-    odfs = []
-    odfapp = odfs.append
+    coeffs = []
+    coeffsapp = coeffs.append
     for sd in sds:
         for sn in sns:
             print(sd, sn)
@@ -98,6 +97,5 @@ def get_odfs(imfn, resultspath, sds, sns):
                                       n_sigma=sn).get_orientations()
 
             theta, phi = odftools.cart_to_spherical(vectors)
-            coeffs = odftools.get_SH_coeffs(20, theta, phi)
-            odfapp(odftools.get_odf(coeffs, sphere))
-    np.save(resultspath + 'odfs', odfs)
+            coeffsapp(odftools.get_SH_coeffs(20, theta, phi))
+    np.save(resultspath + 'coeffs', coeffs)
