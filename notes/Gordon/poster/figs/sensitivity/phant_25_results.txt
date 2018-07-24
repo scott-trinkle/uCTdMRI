@@ -1,0 +1,5 @@
+8000 point sphere
+Peak differences in ST ODF (degrees): [ 0.90593525  1.95024792]
+Peak differences in true ODF (degrees): [ 0.90593525  0.20303688]
+Difference between the differences (degrees): [ 0.          1.74721103]
+ACC: 0.913088936167
