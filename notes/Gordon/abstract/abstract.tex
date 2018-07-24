@@ -7,12 +7,13 @@ right  = 1.5cm]{geometry}
 \usepackage{setspace}
 \setstretch{1.5}
 \usepackage{amsmath}
+\usepackage{upgreek}
 
-\title{Towards whole-brain validation of diffusion MRI fiber orientation
-  distributions with x-ray microcomputed tomography}
-\author{Scott Trinkle, Sean
-  Foxley, Narayanan Kasthuri and Patrick La Rivi\`ere}
-\date{}
+
+\title{\vspace{-2em}Towards whole-brain validation of diffusion MRI fiber
+  orientation distributions with x-ray microcomputed tomography}
+\author{Scott Trinkle, Sean Foxley, Narayanan Kasthuri and Patrick La Rivi\`ere}
+\date{Revised: \today}
 
 \begin{document}
 \maketitle
@@ -24,39 +25,37 @@ reconstructing 3D fiber orientation distributions (FODs) from dMRI data are
 rapidly being developed, each based on the assumption that the diffusion
 contrast from dMRI provides an accurate representation of the underlying
 anatomical fiber structure. Previous efforts to validate these FODs have relied
-on ground truth histological data with non-isotropic resolution over small
+on ground-truth histological data with non-isotropic resolution over small
 regions of interest (ROI). In this study, we demonstrate a pipeline for the use
-of natively isotropic, synchrotron-based x-ray microcomputed tomography data to
-validate FODs over a whole mouse brain.
+of synchrotron-based x-ray microcomputed tomography data to
+validate FODs from dMRI over a whole mouse brain with isotropic resolution.
 
-A post-mortem brain was scanned on a Bruker 9.4 T magnet with a 3D
-diffusion-weighted spin-echo sequence at 150 $\mu\text{m}$ isotropic
-resolution. Data was acquired at a b-value of 3000 s/mm$^2$ over 60 uniformly
-distributed directions. The specimen was then stained with uranyl acetate,
-osmium tetroxide and lead citrate in preparation for x-ray imaging at the
-Advanced Photon Source at Argonne National Lab. The x-ray data was acquired
-using a mosaic stitching method, yielding an image volume over the whole brain
-with 1.2 $\mu$m isotropic resolution. N (number TBD) sample ROIs were identified
-for validation based on anatomical locations with crossing fiber populations
-that are known to challenge dMRI algorithms. Structure tensor analysis was
-performed on the x-ray data to compute a ground truth FOD at each ROI. The
-corresponding FODs were reconstructed from the dMRI data using two high angular
-resolution diffusion imaging (HARDI) methods: constrained spherical
-deconvolution and Q-ball imaging. FODs from both HARDI methods were compared to the
-ground truth x-ray FODS and evaluated based on overall agreement in shape,
-correct assessment of the number of fiber populations, and angular accuracy in
-orientation.
+A perfusion-fixed mouse brain was scanned on a Bruker 9.4 T magnet with a 3D
+diffusion-weighted spin-echo sequence at 150 $\upmu$m isotropic resolution. Data
+were acquired at a b-value of 3000 s/mm$^2$ over 30 uniformly distributed
+directions. The specimen was then stained with uranyl acetate, osmium tetroxide,
+and lead citrate in preparation for synchrotron x-ray imaging at the Advanced
+Photon Source at Argonne National Lab. The x-ray data were acquired using a
+mosaic sinogram stitching method, yielding a reconstructed image volume over the
+whole brain with 2.4 $\upmu$m isotropic resolution.
 
-(Quantitative results TBD)
+Structure tensor analysis was performed on the x-ray data to estimate a primary
+orientation vector at each voxel. These orientations were then grouped into ROI
+the size of a single MRI voxel, and ground-truth FODs were computed by expanding
+the distribution of orientation vectors within each ROI onto spherical harmonic
+coefficients. A sensitivity study was performed with simulated phantoms containing populations
+of fibers with various known crossing angles. Angular peaks in the FODs
+calculated using structure tensor analysis were within two degrees of the true
+peaks for all fiber crossing angles. 
 
-This study has demonstrated the feasibility of performing quantitative 3D
-validation of dMRI FODs with synchrotron x-ray data. This marks the first
-available ground truth dataset and methodology to allow for whole-brain
-validation of dMRI FODs with natively isotropic resolution and no sectioning. The
-application of this analysis to a whole mouse brain will provide a wealth of
-information regarding the ability of different dMRI algorithms to represent
-microstructural regions of varying complexity, and will provide the means to
-perform future large-scale validation studies in dMRI, tractography, and
-connectomics. 
+This work introduces a ground truth dataset and methodology that will allow for
+whole-brain validation of dMRI FODs with natively isotropic resolution and no
+sectioning. Once the X-ray and dMRI data are registered, FODs can be
+reconstructed from the dMRI data using a number of available
+algorithms. Quantitative comparisons to the X-ray FODs across the whole brain
+will provide a wealth of information regarding the ability of these algorithms
+to represent microstructural regions of varying complexity, and will provide the
+means to perform future large-scale validation studies in dMRI, tractography,
+and connectomics.
 
 \end{document}

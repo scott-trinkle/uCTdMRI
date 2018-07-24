@@ -27,7 +27,7 @@ reconstructing 3D fiber orientation distributions (FODs) from dMRI data are
 rapidly being developed, each based on the assumption that the diffusion
 contrast from dMRI provides an accurate representation of the underlying
 anatomical fiber structure. Previous efforts to validate these FODs have relied
-on ground truth histological data with non-isotropic resolution over small
+on ground-truth histological data with non-isotropic resolution over small
 regions of interest (ROI). In this study, we demonstrate a pipeline for the use
 of natively isotropic, synchrotron-based x-ray microcomputed tomography data to
 validate FODs over a whole mouse brain.
@@ -51,9 +51,9 @@ reconstructions were performed using the open-source Dipy Python package
 \subsection{X-ray}
 \subsubsection{Acquisition}
 The specimen was then stained with uranyl acetate,
-osmium tetroxide and lead citrate in preparation for x-ray imaging at the
-Advanced Photon Source at Argonne National Lab. The x-ray data was acquired
-using a mosaic stitching method, yielding an image volume over the whole brain
+osmium tetroxide, and lead citrate in preparation for x-ray imaging at the
+Advanced Photon Source at Argonne National Lab. The x-ray data were acquired
+using a mosaic-stitching method, yielding an image volume over the whole brain
 with 1.2 $\upmu$m isotropic resolution.
 
 
@@ -72,19 +72,19 @@ have extended the analysis to 3D for the same purpose.
 Consider a three-dimensional intensity image, $f(x,y,z)$, with gradient:
 \begin{align}
   \label{eq:grad}
-  \nabla f_{\sigma_d} = {\left(f_x, f_y, f_z\right)}^T
+  \nabla f_{\sigma_d} = {\left(f_x, f_y, f_z\right)}^T,
 \end{align}
 which is calculated using Gaussian derivative filters:
 \begin{align}
   \label{eq:gradcomps}
-  f_x = g_{x,\sigma_d} \ast f & &  f_y = g_{y,\sigma_d} \ast f & &  f_z = g_{z,\sigma_d} \ast f
+  f_x = g_{x,\sigma_d} \ast f & &  f_y = g_{y,\sigma_d} \ast f & &  f_z = g_{z,\sigma_d} \ast f,
 \end{align}
 where $\ast$ denotes the convolution operator and $g_{i, \sigma_d}$ denotes the
 spatial derivative in the $i$-direction of a 3D~Gaussian with
 standard deviation $\sigma_d$:
 \begin{align}
   \label{eq:gauss}
-  g_{i,\sigma_d} &= \frac{\partial}{\partial i}\left(\frac{1}{\left(2\pi\sigma_d^2\right)^{3/2}}\text{ exp}\left\{-\frac{x^2 + y^2 + z^2}{2\sigma_d^2}\right\}\right), & i \in [x, y, z]
+  g_{i,\sigma_d} &= \frac{\partial}{\partial i}\left(\frac{1}{\left(2\pi\sigma_d^2\right)^{3/2}}\text{ exp}\left\{-\frac{x^2 + y^2 + z^2}{2\sigma_d^2}\right\}\right), & i \in [x, y, z].
 \end{align}
 
 The image gradient is used to construct a ``gradient square tensor'' by taking
@@ -96,7 +96,7 @@ the dyadic product of the gradient vector with itself:
     f_x^2 & f_x f_y & f_x f_z \\
     f_x f_y & f_y^2 & f_y f_z \\
     f_x f_z & f_y f_z & f_z^2 \\
-  \end{pmatrix}
+  \end{pmatrix}.
 \end{align}
 
 Each element of the GST is then averaged over a local neighborhood to create the
@@ -134,10 +134,10 @@ The FA is commonly used to threshold the image $f$, so voxels with low
 anisotropy are not included in the orientation distribution.
 
 \subsubsection{Construction of X-ray ODF}\label{alimi}
-The structure tensor analysis generates a principal orientation
-vector at each voxel. Alimi et al. \cite{Alimi2018} describe how
-an ODF can be generated over a 3D ROI by binning the vectors from the X-ray data
-into a spherical histogram expanded on the real spherical harmonics (SH).
+The structure tensor analysis generates a principal orientation vector at each
+voxel. Alimi et al. \cite{Alimi2018} describe how an ODF can be generated over a
+3D ROI by binning orientation vectors into a spherical histogram
+expanded on the real spherical harmonics (SH).
 
 
 The spherical harmonics are defined as
@@ -156,13 +156,10 @@ be expressed as a linear combination of SH:
 \end{align}
 with coefficients $c_{lm}$ given by
 \begin{align}
-  c_{lm} = \int_{\mathbb{S}^2} g(\bm{w}) \bar{Y}_l^m(\bm{w}) \mathrm{d}\bm{w},
+  c_{lm} = \int_{\mathbb{S}^2} g(\theta, \phi) \bar{Y}_l^m(\theta, \phi) \mathrm{d}\bm{\Omega},
   \label{eq:coeffs_0}
 \end{align}
-where the overbar denotes conjugation and
-\begin{align}
-  \bm{w}(\theta, \phi) = [\text{sin}\theta\text{cos}\phi\text{, }  \text{sin}\theta \text{sin}\phi\text{, }  \text{cos}\theta]^T.
-\end{align}
+where the overbar denotes conjugation.
 
 We can model each orientation vector in an X-ray ROI as a Dirac delta function
 $\delta$ on the sphere. That is, in a ROI containing $K$ voxels, our ODF
@@ -180,11 +177,11 @@ delta function can be used, and the integral reduces to:
 A SH approximation $\hat{\text{ODF}}(\theta, \phi)$ can then be determined to an arbitrary
 band-limit $L_{max}$ using Eqn \ref{eq:SHexpand}.
 
-Spherical harmonics are used extensively in the HARDI literature
-to represents ODFs \cite{Tournier2004}. Generally, it is assumed that diffusion is symmetric
-about the origin, so odd-ordered SH components are assumed to be zero and ignored. Furthermore,
-since the diffusion-weighted signal and ODF are both real functions, their SH representations
-exhibit conjugate symmetry:
+Spherical harmonics are used extensively in the HARDI literature to represents
+ODFs \cite{Tournier2004}. Generally, it is assumed that diffusion has even
+symmetry, so odd-ordered SH components are assumed to be zero and
+ignored. Furthermore, since the diffusion-weighted signal and ODF are both real
+functions, their SH representations exhibit conjugate symmetry:
 \begin{align}
   Y_{l}^m(\theta, \phi)_{real} \equiv
   \begin{cases}
@@ -199,7 +196,7 @@ These simplifications hold true for the X-ray ODFs as well. In this work, we use
 band-limit of $L_{max} = 20$, for a total number of 231 even-ordered SH coefficients. 
 
 \subsection{Comparison Metrics}
-A number of features were calculated from the MRI and X-Ray ODFs. A peak finding
+A number of features were calculated from the MRI and X-Ray ODFs. A peak-finding
 algorithm implemented in the Dipy python package \cite{Garyfallidis2014} was
 used to identify the orientations of distinct fiber populations. In this
 algorithm, peaks are defined as points on the ODF that are greater than at least
@@ -218,7 +215,7 @@ two respective ODFs, the ACC is calculated as:
 \end{align}
 The JSD measures the distance between two probability distributions and has also
 been widely used in the dMRI literature \cite{Cohen-Adad2011}. The ODFs are projected onto
-$N$ values equally distributed over a sphere using a Fibonacci sampling algorithm [CITE?].
+$N$ values equally distributed over a sphere using a Fibonacci sampling algorithm~\cite{Hannay2004}.
 The JSD is then defined as
 \begin{align}
   \text{JSD}(P, Q) = \frac{D_{KL}(P, M) + D_{KL}(Q, M)}{2},
@@ -228,7 +225,7 @@ where
   M_i = \frac{P_i + Q_i}{2},
 \end{align}
 $P_i$ and $Q_i$ are the magnitudes of the X-ray and MRI ODFs along index
-$i \in [1, N]$, and $D_{KL}$ is the Kullback-Leibler divergence [CITE?]:
+$i \in [1, N]$, and $D_{KL}$ is the Kullback-Leibler divergence:
 \begin{align}
   D_{KL}(P, Q) = \sum_i P_i\text{log}\left(\frac{P_i}{Q_i}\right).
 \end{align}
@@ -238,7 +235,7 @@ similarity of distributions.
 \section{Sensitivity Study}
 A number of tests were performed to understand the sensitivity of the final
 X-ray ODFs and identified peaks to the various parameters in the structure
-tensor analysis pipeline: specifically the choice of the smoothing factors
+tensor analysis pipeline --- specifically the choice of the smoothing factors
 $\sigma_D$ and $\sigma_N$. 
 
 \subsection{Phantom creation}
@@ -289,7 +286,7 @@ parallel fibers along the z-axis (in and out of the page in Figure
 \ref{fig:xraydata}) and four parallel fibers at a specified angle off the
 z-axis, from 25$^{\circ}$ to 85$^{\circ}$, every 10$^{\circ}$. All fibers in the
 crossing angle phantoms had a radius of 9.6 $\upmu$m. Sample slices from a
-45$^{\circ}$ crossing fiber phantom and a single fiber population phantom (r =
+45$^{\circ}$ crossing-fiber phantom and a single-fiber population phantom (r =
 9.6 $\upmu$m) are shown in Figure \ref{fig:phantoms}.
 
 \begin{figure}[H]
@@ -297,17 +294,30 @@ crossing angle phantoms had a radius of 9.6 $\upmu$m. Sample slices from a
   \begin{subfigure}[t]{0.35\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{figs/deg45}
+  \end{subfigure}
+  \hspace{1em}
+  \begin{subfigure}[t]{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figs/r8}
+    \vspace{1em}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.95\linewidth]{figs/deg_45_volume}
     \caption{45$^{\circ}$ phantom.}
     \label{fig:deg45}
   \end{subfigure}
   \hspace{1em}
   \begin{subfigure}[t]{0.35\textwidth}
     \centering
-    \includegraphics[width=0.9\linewidth]{figs/r8}
-    \caption{Single fiber population phantom, r = 9.6 $\upmu$m.}
+    \includegraphics[width=0.95\linewidth]{figs/r8_volume}
+    \caption{Single-fiber population phantom, r~=~9.6~$\upmu$m.}
     \label{fig:r8}
   \end{subfigure}
-  \caption{Sample crossing fiber and single fiber population phantoms.}
+  \captionsetup{width=0.7\textwidth}
+  \caption{Sample crossing-fiber and single-fiber population phantoms. (Top)
+    Cross-sectional slice showing background, vasculature and fibers. (Bottom)
+    3D volume. rendering of fiber mask.}
   \label{fig:phantoms}
 \end{figure}
 
@@ -334,11 +344,11 @@ Figure~\ref{fig:true_odfs}.
   \begin{subfigure}[t]{0.35\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{figs/r8_ODF}
-    \caption{True ODF for single fiber population phantom, r = 8 pixels.}
+    \caption{True ODF for single-fiber population phantom, r = 8 pixels.}
     \label{fig:r8odf}
   \end{subfigure}
   \captionsetup{width=0.7\textwidth}
-  \caption{Sample true ODFs for crossing fiber and single fiber population
+  \caption{Sample true ODFs for crossing-fiber and single-fiber population
     phantoms.  SH components were calculated up to $L_{max}=20$ and represented
     here on a sphere with $N$=1500 points.}
   \label{fig:true_odfs}
@@ -350,10 +360,10 @@ with values of $\sigma_D$ from 1--10~$\upmu$m spaced 0.5~$\upmu$m apart,
 and values of $\sigma_N$ from 2--12~$\upmu$m spaced 0.5~$\upmu$m apart, for a total
 of~399 combinations per phantom.
 
-A number of evaluation metrics were calculated for each combination of $\sigma$
-values.  The total number of identified peaks was calculated, as well as the
+Five evaluation metrics were calculated for each combination of $\sigma$
+values. The total number of identified peaks was calculated, as well as the
 angular error between the peak locations calculated from the structure tensor
-and true ODFs (for the crossing fiber phantoms, the angular error was averaged
+and true ODFs (for the crossing-fiber phantoms, the angular error was averaged
 between the two peaks).  The ACC and JSD were used to compare the overall shape
 of the ODFs. For a good choice of $\sigma$ values, the voxels within a nerve
 fiber should have a higher FA value than voxels in the background. To assess
@@ -363,7 +373,7 @@ then used as an evaluation metric.
 
 Color plots and summary scatter plots of each metric and phantom are shown in
 Figures~\ref{fig:angle_results}-\ref{fig:angle_max_inds}
-and~\ref{fig:size_results}-\ref{fig:size_max_inds} for crossing fiber and single
+and~\ref{fig:size_results}-\ref{fig:size_max_inds} for crossing-fiber and single
 fiber phantoms, respectively.
 
 For each color plot, $\sigma_D$ is on the x-axis and $\sigma_N$ is on the
@@ -387,45 +397,46 @@ is somewhat arbitrary.
 \newpage
 \begin{center}
   \captionsetup{width=0.9\textwidth} \captionof{figure}{Parameter evaluation
-    metrics for crossing fiber phantoms. Rows indicate crossing angle between
+    metrics for crossing-fiber phantoms. Rows indicate crossing angle between
     fiber populations. Columns indicate evaluation metrics. Colormaps are
     inverted for metrics that are desired to be low (JSD and Peak Error)}
-  \begin{longtable}{cccc}
-    AUC & Peak Error & ACC & JSD\\
-    \im{0.24}{\anglepath{15}{AUC}} & \im{0.24}{\anglepath{15}{ODF_Peak_Error}} & \im{0.24}{\anglepath{15}{ACC}} & \im{0.24}{\anglepath{15}{JSD}}\\
-    \im{0.24}{\anglepath{25}{AUC}} & \im{0.24}{\anglepath{25}{ODF_Peak_Error}} & \im{0.24}{\anglepath{25}{ACC}} & \im{0.24}{\anglepath{25}{JSD}}\\
-    \im{0.24}{\anglepath{35}{AUC}} & \im{0.24}{\anglepath{35}{ODF_Peak_Error}} & \im{0.24}{\anglepath{35}{ACC}} & \im{0.24}{\anglepath{35}{JSD}}\\
-    \im{0.24}{\anglepath{45}{AUC}} & \im{0.24}{\anglepath{45}{ODF_Peak_Error}} & \im{0.24}{\anglepath{45}{ACC}} & \im{0.24}{\anglepath{45}{JSD}}\\
-    \im{0.24}{\anglepath{55}{AUC}} & \im{0.24}{\anglepath{55}{ODF_Peak_Error}} & \im{0.24}{\anglepath{55}{ACC}} & \im{0.24}{\anglepath{55}{JSD}}\\
-    \im{0.24}{\anglepath{65}{AUC}} & \im{0.24}{\anglepath{65}{ODF_Peak_Error}} & \im{0.24}{\anglepath{65}{ACC}} & \im{0.24}{\anglepath{65}{JSD}}\\
-    \im{0.24}{\anglepath{75}{AUC}} & \im{0.24}{\anglepath{75}{ODF_Peak_Error}} & \im{0.24}{\anglepath{75}{ACC}} & \im{0.24}{\anglepath{75}{JSD}}\\
-    \im{0.24}{\anglepath{85}{AUC}} & \im{0.24}{\anglepath{85}{ODF_Peak_Error}} & \im{0.24}{\anglepath{85}{ACC}} & \im{0.24}{\anglepath{85}{JSD}}
+  \begin{longtable}{M{0.05\textwidth} M{0.22\textwidth} M{0.22\textwidth} M{0.22\textwidth} M{0.22\textwidth}}
+    Angle & AUC & Peak Error & ACC & JSD\\
+    15$^{\circ}$ & \im{0.22}{\anglepath{15}{AUC}} & \im{0.22}{\anglepath{15}{ODF_Peak_Error}} & \im{0.22}{\anglepath{15}{ACC}} & \im{0.22}{\anglepath{15}{JSD}}\\
+    25$^{\circ}$ & \im{0.22}{\anglepath{25}{AUC}} & \im{0.22}{\anglepath{25}{ODF_Peak_Error}} & \im{0.22}{\anglepath{25}{ACC}} & \im{0.22}{\anglepath{25}{JSD}}\\
+    35$^{\circ}$ & \im{0.22}{\anglepath{35}{AUC}} & \im{0.22}{\anglepath{35}{ODF_Peak_Error}} & \im{0.22}{\anglepath{35}{ACC}} & \im{0.22}{\anglepath{35}{JSD}}\\
+    45$^{\circ}$ & \im{0.22}{\anglepath{45}{AUC}} & \im{0.22}{\anglepath{45}{ODF_Peak_Error}} & \im{0.22}{\anglepath{45}{ACC}} & \im{0.22}{\anglepath{45}{JSD}}\\
+    55$^{\circ}$ & \im{0.22}{\anglepath{55}{AUC}} & \im{0.22}{\anglepath{55}{ODF_Peak_Error}} & \im{0.22}{\anglepath{55}{ACC}} & \im{0.22}{\anglepath{55}{JSD}}\\
+    65$^{\circ}$ & \im{0.22}{\anglepath{65}{AUC}} & \im{0.22}{\anglepath{65}{ODF_Peak_Error}} & \im{0.22}{\anglepath{65}{ACC}} & \im{0.22}{\anglepath{65}{JSD}}\\
+    75$^{\circ}$ & \im{0.22}{\anglepath{75}{AUC}} & \im{0.22}{\anglepath{75}{ODF_Peak_Error}} & \im{0.22}{\anglepath{75}{ACC}} & \im{0.22}{\anglepath{75}{JSD}}\\
+    85$^{\circ}$ & \im{0.22}{\anglepath{85}{AUC}} & \im{0.22}{\anglepath{85}{ODF_Peak_Error}} & \im{0.22}{\anglepath{85}{ACC}} & \im{0.22}{\anglepath{85}{JSD}}
   \end{longtable}
   \label{fig:angle_results}
 \end{center}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.70\linewidth]{../analysis/by_angle_results/angle_best_params}
-  \captionsetup{width=0.7\linewidth}
+  \includegraphics[width=0.8\linewidth]{../analysis/by_angle_results/angle_best_params_with_regression}
+  \captionsetup{width=0.8\linewidth}
   \caption{Summary of Figure~\ref{fig:angle_results}. Each point indicates the
     $\sigma_D$, $\sigma_N$ pair that maximizes a given metric for a given
     phantom. Different colors indicate different crossing angles and different
-    shapes indicate different metrics.}
+    shapes indicate different metrics. The dashed line shows a linear regression model between
+  $\sigma_D$ and $\sigma_N$ with r=0.77.}
   \label{fig:angle_max_inds}
 \end{figure}
 
 \begin{center}
   \captionsetup{width=0.90\textwidth} \captionof{figure}{Parameter evaluation
-    metrics for single fiber population phantoms. Rows indicate fiber
+    metrics for single-fiber population phantoms. Rows indicate fiber
     radius. Columns indicate evaluation metrics. Colormaps are inverted for
     metrics that are desired to be low (JSD and Peak Error)}
-  \begin{longtable}{cccc}
-    AUC & Peak Error & ACC & AUC\\
-    \im{0.24}{\sizepath{4_8}{AUC}} & \im{0.24}{\sizepath{4_8}{ODF_Peak_Error}} & \im{0.24}{\sizepath{4_8}{ACC}} & \im{0.24}{\sizepath{4_8}{JSD}}\\
-    \im{0.24}{\sizepath{9_6}{AUC}} & \im{0.24}{\sizepath{9_6}{ODF_Peak_Error}} & \im{0.24}{\sizepath{9_6}{ACC}} & \im{0.24}{\sizepath{9_6}{JSD}}\\
-    \im{0.24}{\sizepath{14_4}{AUC}} & \im{0.24}{\sizepath{14_4}{ODF_Peak_Error}} & \im{0.24}{\sizepath{14_4}{ACC}} & \im{0.24}{\sizepath{14_4}{JSD}}\\
-    \im{0.24}{\sizepath{19_2}{AUC}} & \im{0.24}{\sizepath{19_2}{ODF_Peak_Error}} & \im{0.24}{\sizepath{19_2}{ACC}} & \im{0.24}{\sizepath{19_2}{JSD}}
+  \begin{longtable}{M{0.08\textwidth} M{0.22\textwidth} M{0.22\textwidth} M{0.22\textwidth} M{0.22\textwidth}}
+    Radius & AUC & Peak Error & ACC & AUC\\
+    4.8 $\upmu$m & \im{0.22}{\sizepath{4_8}{AUC}} & \im{0.22}{\sizepath{4_8}{ODF_Peak_Error}} & \im{0.22}{\sizepath{4_8}{ACC}} & \im{0.22}{\sizepath{4_8}{JSD}}\\
+    9.6 $\upmu$m & \im{0.22}{\sizepath{9_6}{AUC}} & \im{0.22}{\sizepath{9_6}{ODF_Peak_Error}} & \im{0.22}{\sizepath{9_6}{ACC}} & \im{0.22}{\sizepath{9_6}{JSD}}\\
+    14.4 $\upmu$m & \im{0.22}{\sizepath{14_4}{AUC}} & \im{0.22}{\sizepath{14_4}{ODF_Peak_Error}} & \im{0.22}{\sizepath{14_4}{ACC}} & \im{0.22}{\sizepath{14_4}{JSD}}\\
+    19.2 $\upmu$m & \im{0.22}{\sizepath{19_2}{AUC}} & \im{0.22}{\sizepath{19_2}{ODF_Peak_Error}} & \im{0.22}{\sizepath{19_2}{ACC}} & \im{0.22}{\sizepath{19_2}{JSD}}
   \end{longtable}
   \label{fig:size_results}    
 \end{center}
@@ -468,7 +479,7 @@ space or crossing angle. Note, however, that for each crossing angle phantom,
 the Peak Error is generally within 5$^{\circ}$ for the parameters that maximize
 the ACC and JSD. Note also that Peak Error does not appear sensitive at all to
 the fiber radius; it is exactly 0$^{\circ}$ over nearly all of parameter space
-for all single fiber population phantoms.
+for all single-fiber population phantoms.
 
 \section{Moving forward}
 With the structure tensor parameters now in place, the following remains to be done:

@@ -13,6 +13,8 @@ __pycache__
 *.mov
 *.avi
 *.pptx
+*.pkl
+*.h5
 
 # Folders
 registrations

@@ -74,8 +74,6 @@ class SensitivityData(object):
             self.add_crossing_angle_column()
 
         self.main_cols = ['ACC', 'JSD', 'ODF Peak Error', 'AUC']
-        # if self.metric == 'angle':
-        #     self.main_cols += ['Crossing Angle Error']
 
         print('Creating max inds df')
         self.max_data = self.make_max_inds_df()
