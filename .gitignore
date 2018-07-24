@@ -33,3 +33,10 @@ comparison_report
 xray_first_pass
 second_pass
 notes/Gordon/poster/references
+register/small_xray_to_struct
+register/struct_to_diff_poster
+register/xray_to_struct
+notes/2018-05-25-HARDI/*.npy
+notes/2018-05-25-HARDI/*/results
+notes/2018-05-25-HARDI/*/*.sh
+
