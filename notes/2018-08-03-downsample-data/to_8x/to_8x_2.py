@@ -18,5 +18,5 @@ for fn in fns:
     print(fn.split('/')[-1])
     im = imread(fn)
     im = imresize(im, size=1/factor, interp='bilinear')
-    outfn = outdir + 'recon_8x_' + fn.split('/')[-1].split('_')[1]
+    outfn = outdir + 'recon_8x_' + fn.split('/')[-1].split('_')[-1]
     imsave(outfn, im)
