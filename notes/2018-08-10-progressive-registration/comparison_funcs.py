@@ -22,7 +22,7 @@ def MI(im1, im2, bins):
 
 
 def MSE(arr1, arr2):
-    return ((arr1-arr2)**2).mean()
+    return ((arr1 - arr2)**2).mean()
 
 
 def CC(arr1, arr2):
@@ -59,9 +59,6 @@ def affine_results(res):
                                                            CC_f))
 
 
-res = 150
-
-
 def warp_results(res, bins=1024):
 
     outfn = 'results/warp_{}.csv'.format(res)
@@ -75,7 +72,7 @@ def warp_results(res, bins=1024):
         data[interp] = {}
     for warp_fn, warped_fn in zip(warp_fns, warped_fns):
         for interp in interps:
-            if interp in warp_fn and warped_fn:
+            if (interp in warp_fn) & (interp in warped_fn):
                 warp_img = nib.load(warp_fn)
                 data[interp]['warp'] = np.squeeze(warp_img.get_data())
                 warped_img = nib.load(warped_fn)
@@ -84,7 +81,7 @@ def warp_results(res, bins=1024):
     MRI_data = {}
     for interp in interps:
         MRI_data[interp] = np.squeeze(
-            nib.load('data/mri_{0}um_{1}.nii.gz'.format(res, interp)).get_data())
+            nib.load('data/mri_{0}um_{1}.nii'.format(res, interp)).get_data())
 
     with open(outfn, 'w') as f:
         f.write('Resolution,Kind,Interp-pair,MSE,CC,MI\n')
@@ -103,6 +100,63 @@ def warp_results(res, bins=1024):
         for interp in interps:
             f.write('{0},{1},{2},{3},{4},{5}\n'.format(res,
                                                        'warped',
+                                                       interp,
+                                                       MSE(data[interp]['warped'],
+                                                           MRI_data[interp]),
+                                                       CC(data[interp]['warped'],
+                                                          MRI_data[interp]),
+                                                       MI(data[interp]['warped'],
+                                                          MRI_data[interp],
+                                                          bins=bins)))
+
+
+def sample_warp_results(res, bins=1024):
+
+    outfn = 'results/sample_warp_{}.csv'.format(res)
+    old_warp_fns = glob(
+        'registrations/*_{res}/*{res}1Warp.nii.gz'.format(res=res))
+    warp_fns = glob(
+        'registrations/*_{res}/sampled_*{res}1Warp.nii'.format(res=res))
+    warped_fns = glob(
+        'registrations/*_{res}/*{res}_sampled_Warped.nii.gz'.format(res=res))
+
+    data = {}
+    interps = ['bicubic', 'bilinear', 'no_interp']
+    for interp in interps:
+        data[interp] = {}
+    for warp_fn, warped_fn, old_warp_fn in zip(warp_fns, warped_fns, old_warp_fns):
+        for interp in interps:
+            if (interp in warp_fn) & (interp in warped_fn) & (interp in old_warp_fn):
+                warp_img = nib.load(warp_fn)
+                data[interp]['warp'] = np.squeeze(warp_img.get_data())
+                warped_img = nib.load(warped_fn)
+                data[interp]['warped'] = np.squeeze(warped_img.get_data())
+                old_warp_img = nib.load(old_warp_fn)
+                data[interp]['old-warp'] = np.squeeze(old_warp_img.get_data())
+
+    MRI_data = {}
+    for interp in interps:
+        MRI_data[interp] = np.squeeze(
+            nib.load('data/mri_{0}um_{1}.nii'.format(res, interp)).get_data())
+
+    with open(outfn, 'w') as f:
+        f.write('Resolution,Kind,Interp-pair,MSE,CC,MI\n')
+        for int1 in interps:
+            for int2 in interps:
+                f.write('{0},{1},{2}_{3},{4},{5},{6}\n'.format(res,
+                                                               'sample-warp',
+                                                               'sample-' + int1,
+                                                               int2,
+                                                               MSE(data[int1]['warp'],
+                                                                   data[int2]['old-warp']),
+                                                               CC(data[int1]['warp'],
+                                                                  data[int2]['old-warp']),
+                                                               MI(data[int1]['warp'],
+                                                                   data[int2]['old-warp'],
+                                                                   bins=bins)))
+        for interp in interps:
+            f.write('{0},{1},{2},{3},{4},{5}\n'.format(res,
+                                                       'sample-warped',
                                                        interp,
                                                        MSE(data[interp]['warped'],
                                                            MRI_data[interp]),
