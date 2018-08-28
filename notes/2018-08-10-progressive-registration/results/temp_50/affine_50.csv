@@ -1,0 +1,4 @@
+Resolution,Interp-pair,MSE_t,CC_t,MSE_f,CC_f
+150,bicubic_bilinear,0.0,0.9999999999999999,0.0,1.0
+150,bicubic_no_interp,0.0,0.9999999999999999,0.0,1.0
+150,bilinear_no_interp,0.0,0.9999999999999999,0.0,1.0
