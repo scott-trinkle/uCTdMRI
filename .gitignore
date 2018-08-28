@@ -11,6 +11,7 @@ __pycache__
 # Large files
 *.tif
 *.tiff
+*.nii
 *.nii.gz
 *.vtu
 *.mov

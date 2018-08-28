@@ -12,8 +12,8 @@ def get_FOD(fn, ID):
 
     print('Calculating vectors')
     FA, vectors = StructureTensor(im,
-                                  d_sigma=15 / 2.4,
-                                  n_sigma=13 / 2.4).results()
+                                  d_sigma=15 / 1.2,
+                                  n_sigma=13 / 1.2).results()
     np.save('results/{}_FA'.format(ID), FA)
     np.save('results/{}_vectors'.format(ID), vectors)
 
@@ -29,3 +29,8 @@ def get_FOD(fn, ID):
 
 
 fns = glob('./samples/*.tif')
+
+for fn in fns:
+    ID = fn.split('.tif')[0].split('/')[-1]
+    get_FOD(fn, ID)
+    print()
