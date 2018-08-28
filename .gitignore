@@ -31,6 +31,7 @@ odfs
 precomputed
 generic_xyz
 comparison_report
+*whole-brain-PI-Report*
 xray_first_pass
 second_pass
 notes/Gordon/poster/references
@@ -40,4 +41,7 @@ register/xray_to_struct
 notes/2018-05-25-HARDI/*.npy
 notes/2018-05-25-HARDI/*/results
 notes/2018-05-25-HARDI/*/*.sh
+*memory_profiling*
+*FA_test_results
+maxmin
 
