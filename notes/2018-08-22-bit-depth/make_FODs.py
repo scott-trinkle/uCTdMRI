@@ -11,9 +11,7 @@ def get_FOD(fn, ID):
     im = imread(fn)
 
     print('Calculating vectors')
-    FA, vectors = StructureTensor(im,
-                                  d_sigma=15 / 1.2,
-                                  n_sigma=13 / 1.2).results()
+    FA, vectors = StructureTensor(im).results()
     np.save('results/{}_FA'.format(ID), FA)
     np.save('results/{}_vectors'.format(ID), vectors)
 
