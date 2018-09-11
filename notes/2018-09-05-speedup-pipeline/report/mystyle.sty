@@ -1,0 +1,45 @@
+\ProvidesPackage{mystyle}
+
+\usepackage[
+top    = 1.5cm,
+bottom = 1.5cm,
+left   = 1.5cm,
+right  = 1.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{upgreek}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[usenames, dvipsnames]{color}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{bm}
+\usepackage{longtable}
+\usepackage{array}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=NavyBlue,
+    urlcolor=NavyBlue,
+    citecolor=NavyBlue}
+\urlstyle{same}
+
+\setlength{\skip\footins}{0.75cm}
+
+\renewcommand{\baselinestretch}{1.25}
+\hyphenpenalty=10000
+
+\newcommand{\im}[2]{\includegraphics[width=#1\textwidth]{#2}}
+\newcommand{\odfpath}[2]{../results/odfs/sample_#1_#2}
+
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+\newcommand{\uct}{$\upmu$CT }
+\newcommand{\um}{$\upmu$m }
