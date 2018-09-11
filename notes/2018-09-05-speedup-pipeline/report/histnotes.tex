@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage[top=1.5cm,
+  bottom=1.5cm,
+  left=1.5cm,
+  right=1.5cm]{geometry}
+
+\title{Spherical histogram notes}
+\date{}
+\begin{document}
+\maketitle
+
+Algorithm for finding the spherical harmonic coefficients $\{c\}$. 
+
+\begin{itemize}
+\item Choose $N$ spherical bin points
+\item Find bin counts $b_n$ from a list of $K$ vectors
+\item For a given $l$, $m$, calculate the coefficient as
+  
+  \begin{align}
+    c_{l,m} = \frac{1}{K}\sum_N b_n Y_{l}^{m}(\theta_n, \phi_n)
+  \end{align}
+\end{itemize}
+
+We expect the true orientation distribution function to be even about the origin,
+hence the existing implementation which only uses the even-ordered $l$ values.
+
+However, we do not necessarily expect the raw ODF coming from the structure tensor
+orientation estimates to be even. We can force the raw ODF to be even
+by adding a new sample point on the sphere ($\theta_n +\pi, \phi_n)$ and giving it the
+bin value $b_n$ for each existing point ($\theta_n, \phi_n$). The final calculation
+of the SH coefficient thus looks like
+\begin{align}
+  c_{l,m} = \frac{1}{2K}\sum_N b_n \left[Y_{l}^{m}(\theta_n, \phi_n) + Y_l^m(\theta_n + \pi, \phi_n)\right]
+\end{align}
+
+Currently, this is implemented as follows:
+
+\begin{align}
+  \label{eq:1}
+  c_{lm} = sum(\bm{b} \cdot (\bm{Y}_{lm}^{+} + \bm{Y}_{lm}^{-})) / 2K
+\end{align}
+
+  
+  
+\end{document}
