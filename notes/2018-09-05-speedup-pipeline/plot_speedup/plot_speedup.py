@@ -69,8 +69,8 @@ err = speedup * perc_err
 
 fig, ax = plt.subplots()
 ax.errorbar(ns, 100 - speedup*100, yerr=err*100, fmt='k:o', ms=3)
-ax.set_xlabel('Number of bins')
-ax.set_ylabel('Percent speedup')
-ax.set_title('Speedup')
+ax.set_xlabel('Number of sample points')
+ax.set_ylabel('Percent speed-up')
+ax.set_title('Speed-up')
 plt.tight_layout()
 plt.savefig('speedup.pdf')

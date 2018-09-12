@@ -28,7 +28,7 @@ else:
 
 fig, ax = plt.subplots()
 ax.plot(ns, rmses, 'k:o', ms=4)
-ax.set_xlabel('Number of bins')
+ax.set_xlabel('Number of sample points')
 ax.set_ylabel('Root Mean squared error')
 ax.set_title('RMSE')
 plt.tight_layout()

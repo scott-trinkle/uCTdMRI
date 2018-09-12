@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage{mystyle}
 
-\title{Notes on faster spherical harmonic expansion implementation}
+\title{Notes on binned spherical harmonic expansion implementation}
 \author{Scott Trinkle}
 \date{Last edited: \today}
 \begin{document}
@@ -62,7 +62,7 @@ A SH approximation $\hat{\text{FOD}}(\theta, \phi)$ can then be determined to an
 band-limit $L_{max}$ using Eqn \ref{eq:SHexpand}.
 
 Spherical harmonics are used extensively in the HARDI literature to represent
-FODs. Generally, it is assumed that diffusion has even
+FODs. Generally, it is assumed that diffusion has antipodal
 symmetry, so odd-ordered SH components are assumed to be zero and
 ignored. Furthermore, since the diffusion-weighted signal and ODF are both real
 functions, their SH representations exhibit conjugate symmetry:
@@ -94,13 +94,11 @@ to estimate the orientations themselves.
 
 \section{New implementation: spherical binning}
 \subsection{From orientations to FOD}
-The primary change comes in how the FOD is constructed from the orientation
-vectors. Representing the FOD as a sum of $K\approx 2 \times 10^6$ delta
-functions required each of the spherical harmonics to be evaluated at $K$
-points. With the new method, the FOD is instead constructed as a histogram on
-the sphere using $N$ approximately uniform sampling points as the bin centers.
-
-The $N$ sampling points are chosen using a Fibonacci sampling
+Representing the FOD as a sum of $K\approx 2 \times 10^6$ delta functions
+required each of the spherical harmonics to be evaluated at $K$ points. With the
+new method, the FOD is instead constructed as a histogram on the sphere using
+$N \ll K$ approximately uniform sampling points as the bin centers. The $N$
+sampling points are chosen using a Fibonacci sampling
 algorithm~\cite{Hannay2004}. The $K$ vectors are sorted into the corresponding
 bins using a very fast nearest-neighbors search algorithm, implemented with a
 \href{https://en.wikipedia.org/wiki/Ball_tree}{``ball tree''} nested data
@@ -108,8 +106,7 @@ structure in the
 \href{http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors}{\texttt{scikit-learn}}
 Python package.
 
-This ``binned'' FOD can be written as a weighted sum of $N$ delta functions,
-where $N \ll K$:
+This ``binned'' FOD can be written as a weighted sum of $N$ delta functions:
 \begin{align}
   \label{eq:3}
   \text{FOD}_b = \frac{1}{K}\sum_{n=1}^N b_n \delta(\theta - \theta_n)\delta(\phi - \phi_n),
@@ -127,23 +124,132 @@ The calculation of the spherical harmonic coefficients proceeds in the same way.
 The same symmetries are exploited from Eqn \ref{eq:real_Y}.
 
 \section{Results}
+\subsection{Raw FOD visualization}
+An MRI-voxel-sized ROI (125$\times$125$\times$125 voxels) was taken from \uct
+data, and the orientations at each voxel were estimated with structure tensor
+analysis. For the purposes of this report, orientations were not thresholded by
+FA or pixel value to mask out non-fiber voxels.
+
+One advantage to the new binning method is that it allow us to directly
+visualize the raw FOD before expanding it onto spherical harmonics. Figure
+\ref{fig:fod_raw} is a plot of this FOD calculated according to Eqn~\ref{eq:3}
+with $N=6500$. Notably, the raw FOD does not have antipodal symmetry. This is
+not surprising --- the orientations at each voxel are calculated as eigenvectors
+of a tensor. These normalized eigenvectors are unique within a minus sign; at
+each voxel, the opposite orientation might as well have been
+reported. Furthermore, the FODs calculated with the dMRI methods of interest
+will always have antipodal symmetry. Accordingly, the true \uct FOD we are
+interested in estimating is shown in Figure~\ref{fig:fod_even}, which was
+calculated by taking every point from Figure~\ref{fig:fod_raw} and assigning the
+same bin count to the opposite point. Note that we are already enforcing this
+symmetry in the SH representation by only using even-ordered coefficients. I
+tested calculating the coefficients from the FODs in both Fig~\ref{fig:fod_raw}
+and Fig~\ref{fig:fod_even} and they were identical.
+
+
 
 \begin{figure}[h]
   \centering
-  \begin{subfigure}[n]{0.48\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=0.8\linewidth]{../odf_comparison/raw_odf}
-    \caption{Raw}
+    \includegraphics[width=0.9\linewidth]{../odf_comparison/raw_odf}
+    \caption{Raw orientations}
+    \label{fig:fod_raw}
   \end{subfigure}
   \hspace{0.5em}
-  \begin{subfigure}[n]{0.48\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=0.8\linewidth]{../odf_comparison/raw_odf_even}
-    \caption{``Forced-even''}
+    \includegraphics[width=0.9\linewidth]{../odf_comparison/raw_odf_even}
+    \caption{After enforcing antipodal symmetry}
+    \label{fig:fod_even}
   \end{subfigure}
-  \caption{The ``binned'' FOD}
-  \label{fig:raw_fods}
+  \caption{The ``binned'' \uct FOD}
 \end{figure}
+
+\subsection{Comparison of methods}
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../odf_comparison/delta_odf_sh}
+    \caption{Delta}
+    \label{fig:delta}
+  \end{subfigure}
+  \hspace{0.5em}
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../odf_comparison/hist_odf_sh}
+    \caption{Binned}
+    \label{fig:binned}
+  \end{subfigure}
+  \caption{SH FOD representations}
+  \label{fig:vis_comparison}
+\end{figure}
+
+Figure~\ref{fig:vis_comparison} shows a comparison of the SH representation of
+the FODs calculated with the delta function method (Fig~\ref{fig:delta},
+Eqn~\ref{eq:1}) and the spherical binning method (Fig~\ref{fig:binned},
+Eqn~\ref{eq:3}). The binned FOD was calculated using $N=6500$ sample points, and
+both FODs were also plotted on a sphere with the same $N=6500$ points. Bth SH
+representations look like spherically ``blurred'' versions of
+Figure~\ref{fig:fod_even}, as we expect.
+
+Visually, the difference between the two FODs are negligible. This difference is
+quantified in Figure~\ref{fig:rmse} as the root mean squared error (RMSE) of the
+SH coefficients, plotted as a function of the number of sampling points. The RMSE is
+calculated as
+\begin{align}
+  \label{eq:rmse}
+  \text{RMSE} = \sqrt{\frac{1}{N_{SH}}\sum_{l,m} \left[c_{lm}^{\delta} - c_{lm}^{b}(N)\right]^2},
+\end{align}
+where $N_{SH}=231$ is the total number of SH coefficients,
+$c_{lm}^{\delta}$ is the SH coefficient for $l$ and $m$ calculated with the delta
+function method and $c_{lm}^b(N)$ is the SH coefficient for $l$ and $m$ calculated
+with the binned method using $N$ sample points.
+
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../plot_rmse/rmse}
+    \caption{RMSE}
+    \label{fig:rmse}
+  \end{subfigure}
+  \hspace{0.5em}
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../plot_speedup/speedup}
+    \caption{Speedup}
+    \label{fig:speedup}
+  \end{subfigure}
+  \caption{Performance metrics}
+  \label{fig:metrics}
+\end{figure}
+Figure~\ref{fig:speedup} shows the corresponding speed-up of computation time
+between the two methods. For each $N$, a single ``best-case'' time measurement
+was recorded as the lowest time of three separate executions. The average time
+$\bar{t}_N$ and error $\sigma_N$ were taken as the mean and standard deviation
+of ten of these lowest times; thus, the coefficients were calculated a total of
+30 times for each $N$, as well as for the delta method. The percent speed-up (SU$_N$)
+was then calculated as
+\begin{align}
+  \text{SU}_N = \left(1 - \frac{\bar{t}_N}{\bar{t}_{\delta}}\right)\times 100,
+\end{align}
+where $\bar{t}_{\delta}$ is the mean execution time for the delta method. The error
+in SU$_N$ was calculated by adding the relative errors of the binned and delta times:
+\begin{align}
+  \sigma_{SU,N} = \left(\frac{\sigma_N}{\bar{t}_N} + \frac{\sigma_{\delta}}{\bar{t}_{\delta}}\right)\times \text{SU}_N
+\end{align}
+
+\section{Conclusion}
+Together, these plots show that for an adequate number of sampling points, the
+binned FOD method approaches a 100\% speedup with very little loss in accuracy.
+The percent speedup generally decreases with increasing $N$, as expected, though
+it stays consistently over 95\%. The RMSE seems to level off after around
+$N=6500$. With this level of accuracy, the FODs could be calculated across the
+whole brain in a much more managable computation time of \textapprox 140 hours.
+Spread across multiple nodes, this could be completed in less than a day. 
+
 
 \bibliographystyle{ieeetr}
 \bibliography{SH_speedup_notes}  

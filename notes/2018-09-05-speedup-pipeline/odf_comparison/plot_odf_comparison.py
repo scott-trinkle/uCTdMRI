@@ -3,7 +3,7 @@ from strtens.vis import show_ODF
 from strtens import odftools
 from dipy.data import Sphere
 
-sphere = odftools.make_sphere(4000)
+sphere = odftools.make_sphere(6500)
 
 print('Loading data')
 vectors = np.load('../data/sample_8_8_vectors.npy').reshape((-1, 3))
