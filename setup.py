@@ -15,6 +15,8 @@ setup(name='strtens',
       author_email='tscott.trinkle@gmail.com',
       license='MIT',
       packages=['strtens'],
+      package_dir={'strtens': 'strtens'},
+      package_data={'strtens': ['data/*']},
       install_requires=['numpy', 'scikit-image',
                         'scipy', 'scikit-learn', 'dipy'],
       zip_safe=False)
