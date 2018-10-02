@@ -3,16 +3,20 @@ from tifffile import imread, imsave
 import matplotlib.pyplot as plt
 from glob import glob
 
+# Values from ImageJ selectio box
+width = 5496
+height = 3378
+x0 = 1890
+y0 = 1488
+
 # Setting ROI corners
-xs = [2173, 3791, 3504, 4092, 5670, 6768, 6864, 8028, 8874, 5358]
-ys = [2950, 1145, 2886, 4170, 2472, 2802, 1452, 1254, 3714, 2256]
+nrows = 15
+xs = np.linspace(x0, x0 + width, nrows, dtype=np.int)
+ys = np.linspace(y0, y0 + width, nrows, dtype=np.int)
 d = 125
 
-# Removing missing recon_8 slices
-nums = list(range(6250, 6375))
-nums.remove(6301)
-nums.remove(6354)
-nums.remove(6368)
+# Slice numbers
+nums = np.arange(10250, 10375)
 
 # Recon_32_cropped filenames
 fns32 = [
