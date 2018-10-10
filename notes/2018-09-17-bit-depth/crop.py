@@ -1,10 +1,11 @@
 import numpy as np
-from glob import glob
 from tifffile import imread, imsave
 
-fns = glob('../../../Data/2017_07_22_WholeMouseMRI_5x_2k_phase35cm_gap31_exp30_newfocus/recon_flatcorr_1x/recon/*')
+fns = ['../../../Data/2018_04_03_WholeBrainMRI1_retake_newfocus/recon_flatcorr_1x/recon/recon_{}.tiff'.format(
+    i) for i in range(10250, 10375)]
 
-x0, y0 = 4919-4907, 2554-922
+
+x0, y0 = 4919 - 4907, 2554 - 922
 dx, dy = 9156, 5958
 
 for fn in fns:
