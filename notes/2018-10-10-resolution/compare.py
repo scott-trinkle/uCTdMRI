@@ -93,7 +93,7 @@ for col in df.columns:
     ax1, ax2 = ax[0, :]
     ax3, ax4 = ax[1, :]
 
-    nbins = 75
+    nbins = 30
 
     ax1.hist(df.loc[2][col], bins=nbins)
     ax1.set_xlabel(col)
